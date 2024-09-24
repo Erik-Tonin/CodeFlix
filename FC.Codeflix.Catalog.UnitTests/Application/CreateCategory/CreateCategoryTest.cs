@@ -13,8 +13,7 @@ namespace FC.Codeflix.Catalog.UnitTests.Application.CreateCategory
         private readonly CreateCategoryTestFixture _fixture;
 
         public CreateCategoryTest(CreateCategoryTestFixture fixture)
-            => _fixture = fixture;
-        
+            => _fixture = fixture;        
 
         [Fact(DisplayName =nameof(CreateCategory))]
         [Trait("Application", "CreateCategory - Use Cases")]
@@ -40,10 +39,13 @@ namespace FC.Codeflix.Catalog.UnitTests.Application.CreateCategory
             output.CreatedAt.Should().NotBeSameDateAs(default(DateTime));
         }
 
-        [Theory(DisplayName = nameof(ThrowWhenCantInstatiateAggregate))]
+        [Theory(DisplayName = nameof(ThrowWhenCantInstatiateCategory))]
         [Trait("Application", "CreateCategory - Use Cases")]
-        [MemberData(nameof(GetInvalidInputs))]
-        public async void ThrowWhenCantInstatiateAggregate(CreateCategoryInput createCategoryInput, string exceptionMessage)
+        [MemberData(nameof(CreateCategoryTestDataGenerator.GetInvalidInputs),
+            parameters: 12,
+            MemberType = typeof(CreateCategoryTestDataGenerator)
+        )]
+        public async void ThrowWhenCantInstatiateCategory(CreateCategoryInput createCategoryInput, string exceptionMessage)
         {
             var useCase = new UseCases.CreateCategory(_fixture.GetRepositoryMock().Object, _fixture.GetUnitOfWorkMock().Object);
 
@@ -52,34 +54,52 @@ namespace FC.Codeflix.Catalog.UnitTests.Application.CreateCategory
             await task.Should().ThrowAsync<EntityValidationException>().WithMessage(exceptionMessage);
         }
 
-        public static IEnumerable<object[]> GetInvalidInputs()
+        [Fact(DisplayName = nameof(CreateCategoryWithOnlyName))]
+        [Trait("Application", "CreateCategory - Use Cases")]
+        public async void CreateCategoryWithOnlyName()
         {
+            var repositoryMock = _fixture.GetRepositoryMock();
+            var unitOfWorkMock = _fixture.GetUnitOfWorkMock();
 
-            var fixture = new CreateCategoryTestFixture();
-            var invalidInputs = new List<object[]>();
+            var useCase = new UseCases.CreateCategory(repositoryMock.Object, unitOfWorkMock.Object);
 
-            var invalidInputShortName = fixture.GetInput();
-            invalidInputShortName.Name = invalidInputShortName.Name.Substring(0, 2);
-            invalidInputs.Add(new object[]
-            {
-                invalidInputShortName,
-                "Name should be at leats 3 characters long"
-            });
+            var input = new CreateCategoryInput(_fixture.GetValidCategoryName());
 
-            var invalidInputTooLongName = fixture.GetInput();
-            var tooLongNameForCategory = fixture.Faker.Commerce.ProductName();
+            var output = await useCase.Handle(input, CancellationToken.None);
 
-            while (tooLongNameForCategory.Length <= 255)
-                tooLongNameForCategory = $"{tooLongNameForCategory} {fixture.Faker.Commerce.ProductName()}";
+            repositoryMock.Verify(repository => repository.Insert(It.IsAny<Category>(), It.IsAny<CancellationToken>()), Times.Once);
+            unitOfWorkMock.Verify(unitOfWork => unitOfWork.Commit(It.IsAny<CancellationToken>()), Times.Once);
 
-            invalidInputTooLongName.Name = tooLongNameForCategory;
-            invalidInputs.Add(new object[]
-            {
-                invalidInputTooLongName,
-                "Name should be less or equal 255 characters long"
-            });
+            output.Should().NotBeNull();
+            output.Name.Should().Be(input.Name);
+            output.Description.Should().Be("");
+            output.IsActive.Should().BeTrue();
+            output.Id.Should().NotBeEmpty();
+            output.CreatedAt.Should().NotBeSameDateAs(default(DateTime));
+        }
 
-            return invalidInputs;
+        [Fact(DisplayName = nameof(CreateCategoryWithOnlyNameAndDescription))]
+        [Trait("Application", "CreateCategory - Use Cases")]
+        public async void CreateCategoryWithOnlyNameAndDescription()
+        {
+            var repositoryMock = _fixture.GetRepositoryMock();
+            var unitOfWorkMock = _fixture.GetUnitOfWorkMock();
+
+            var useCase = new UseCases.CreateCategory(repositoryMock.Object, unitOfWorkMock.Object);
+
+            var input = new CreateCategoryInput(_fixture.GetValidCategoryName(), _fixture.GetValidCategoryDescription());
+
+            var output = await useCase.Handle(input, CancellationToken.None);
+
+            repositoryMock.Verify(repository => repository.Insert(It.IsAny<Category>(), It.IsAny<CancellationToken>()), Times.Once);
+            unitOfWorkMock.Verify(unitOfWork => unitOfWork.Commit(It.IsAny<CancellationToken>()), Times.Once);
+
+            output.Should().NotBeNull();
+            output.Name.Should().Be(input.Name);
+            output.Description.Should().Be(input.Description);
+            output.IsActive.Should().BeTrue();
+            output.Id.Should().NotBeEmpty();
+            output.CreatedAt.Should().NotBeSameDateAs(default(DateTime));
         }
     }
 }
