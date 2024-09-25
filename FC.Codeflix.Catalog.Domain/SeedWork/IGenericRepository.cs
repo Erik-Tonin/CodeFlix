@@ -4,5 +4,6 @@
     {
         public Task Insert(TAggregate aggregate, CancellationToken cancellation);
         public Task<TAggregate> Get(Guid id, CancellationToken cancellationToken);
+        public Task Delete(TAggregate aggregate, CancellationToken cancellationToken);
     }
 }
