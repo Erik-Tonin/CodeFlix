@@ -1,4 +1,4 @@
-﻿namespace FC.Codeflix.Catalog.UnitTests.Application.UpdateCategory
+﻿namespace FC.Codeflix.Catalog.UnitTests.Application.Category.UpdateCategory
 {
     public class UpdateCategoryTestDataGenerator
     {
@@ -9,7 +9,7 @@
             {
                 var exampleCategory = fixture.GetExampleCategory();
                 var exampleInput = fixture.GetValidInput(exampleCategory.Id);
-                yield return new object[] {exampleCategory, exampleInput};
+                yield return new object[] { exampleCategory, exampleInput };
             }
         }
 

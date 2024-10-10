@@ -1,9 +1,8 @@
 ﻿using DomainEntity = FC.Codeflix.Catalog.Domain.Entity;
 using FC.Codeflix.Catalog.Domain.Exceptions;
-using FC.Codeflix.Catalog.UnitTests.Domain.Entity.Category;
 using FluentAssertions;
 
-namespace FC.Codeflix.Catalog.UnitTests.Domain.Entity
+namespace FC.Codeflix.Catalog.UnitTests.Domain.Entity.Category
 {
     [Collection(nameof(CategoryTestFixture))]
 
@@ -35,10 +34,10 @@ namespace FC.Codeflix.Catalog.UnitTests.Domain.Entity
             category.Name.Should().Be(validCategory.Name);
             category.Description.Should().Be(validCategory.Description);
             category.Id.Should().NotBeEmpty();
-            category.CreatedAt.Should().NotBeSameDateAs(default(DateTime));
+            category.CreatedAt.Should().NotBeSameDateAs(default);
             (category.CreatedAt >= dateTimeBefore).Should().BeTrue();
             (category.CreatedAt <= dateTimeAfter).Should().BeTrue();
-            (category.IsActive).Should().BeTrue();
+            category.IsActive.Should().BeTrue();
         }
 
         [Theory(DisplayName = nameof(InstantiateWithIsActive))]
@@ -59,10 +58,10 @@ namespace FC.Codeflix.Catalog.UnitTests.Domain.Entity
             category.Name.Should().Be(validCategory.Name);
             category.Description.Should().Be(validCategory.Description);
             category.Id.Should().NotBeEmpty();
-            category.CreatedAt.Should().NotBeSameDateAs(default(DateTime));
+            category.CreatedAt.Should().NotBeSameDateAs(default);
             (category.CreatedAt > dateTimeBefore).Should().BeTrue();
             (category.CreatedAt < dateTimeAfter).Should().BeTrue();
-            (category.IsActive).Should().Be(isActive);
+            category.IsActive.Should().Be(isActive);
         }
 
         [Theory(DisplayName = nameof(InstantiateErrorWhenNameIsEmpty))]
@@ -128,7 +127,7 @@ namespace FC.Codeflix.Catalog.UnitTests.Domain.Entity
         {
             var validCategory = _categoryTestFixture.GetValidCategory();
 
-            var invalidName = String.Join(null, Enumerable.Range(1, 256).Select(_ => "a").ToArray());
+            var invalidName = string.Join(null, Enumerable.Range(1, 256).Select(_ => "a").ToArray());
 
             Action action =
                 () => new DomainEntity.Category(invalidName, validCategory.Description);
@@ -144,7 +143,7 @@ namespace FC.Codeflix.Catalog.UnitTests.Domain.Entity
         {
             var validCategory = _categoryTestFixture.GetValidCategory();
 
-            var invalidDescription = String.Join(null, Enumerable.Range(1, 10001).Select(_ => "a").ToArray());
+            var invalidDescription = string.Join(null, Enumerable.Range(1, 10001).Select(_ => "a").ToArray());
 
             Action action =
                 () => new DomainEntity.Category(validCategory.Name, invalidDescription);
@@ -190,7 +189,7 @@ namespace FC.Codeflix.Catalog.UnitTests.Domain.Entity
             category.Update(newValues.Name, newValues.Description);
 
             category.Name.Should().Be(newValues.Name);
-            category.Description.Should().Be(newValues.Description);        
+            category.Description.Should().Be(newValues.Description);
         }
 
         [Fact(DisplayName = nameof(UpdateOnlyName))]

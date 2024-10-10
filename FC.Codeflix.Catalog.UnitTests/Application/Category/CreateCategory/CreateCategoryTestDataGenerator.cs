@@ -1,4 +1,5 @@
-﻿namespace FC.Codeflix.Catalog.UnitTests.Application.CreateCategory
+﻿
+namespace FC.Codeflix.Catalog.UnitTests.Application.Category.CreateCategory
 {
     public class CreateCategoryTestDataGenerator
     {
@@ -8,7 +9,7 @@
             var invalidInputs = new List<object[]>();
             var totalInvalidCases = 4;
 
-            for(int index = 0; index < times; index++)
+            for (int index = 0; index < times; index++)
             {
                 switch (index % totalInvalidCases)
                 {
@@ -43,7 +44,7 @@
                     default:
                         break;
                 }
-            }        
+            }
             return invalidInputs;
         }
     }

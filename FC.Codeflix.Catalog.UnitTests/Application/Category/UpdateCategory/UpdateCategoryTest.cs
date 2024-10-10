@@ -1,13 +1,13 @@
 ﻿using FC.Codeflix.Catalog.Application.Exceptions;
 using FC.Codeflix.Catalog.Application.UseCases.Category.Common;
 using FC.Codeflix.Catalog.Application.UseCases.Category.UpdateCategory;
-using FC.Codeflix.Catalog.Domain.Entity;
 using FC.Codeflix.Catalog.Domain.Exceptions;
 using FluentAssertions;
 using Moq;
+using DomainEntity = FC.Codeflix.Catalog.Domain.Entity;
 using UseCase = FC.Codeflix.Catalog.Application.UseCases.Category.UpdateCategory;
 
-namespace FC.Codeflix.Catalog.UnitTests.Application.UpdateCategory
+namespace FC.Codeflix.Catalog.UnitTests.Application.Category.UpdateCategory
 {
     [Collection(nameof(UpdateCategoryTestFixture))]
     public class UpdateCategoryTest
@@ -22,7 +22,7 @@ namespace FC.Codeflix.Catalog.UnitTests.Application.UpdateCategory
         [Theory(DisplayName = nameof(UpdateCategory))]
         [Trait("Application", "UpdateCategory - Use Cases")]
         [MemberData(nameof(UpdateCategoryTestDataGenerator.GetCategoriesToUpdate), parameters: 10, MemberType = typeof(UpdateCategoryTestDataGenerator))]
-        public async Task UpdateCategory(Category exampleCategory, UseCase.UpdateCategoryInput input)
+        public async Task UpdateCategory(DomainEntity.Category exampleCategory, UpdateCategoryInput input)
         {
             var repositoryMock = _fixture.GetRepositoryMock();
             var unitOfWorkMock = _fixture.GetUnitOfWorkMock();
@@ -76,7 +76,7 @@ namespace FC.Codeflix.Catalog.UnitTests.Application.UpdateCategory
         [Theory(DisplayName = nameof(UpdateCategoryWithoutProvidingIsActive))]
         [Trait("Application", "UpdateCategory - Use Cases")]
         [MemberData(nameof(UpdateCategoryTestDataGenerator.GetCategoriesToUpdate), parameters: 10, MemberType = typeof(UpdateCategoryTestDataGenerator))]
-        public async Task UpdateCategoryWithoutProvidingIsActive(Category exampleCategory, UseCase.UpdateCategoryInput exampleInput)
+        public async Task UpdateCategoryWithoutProvidingIsActive(DomainEntity.Category exampleCategory, UpdateCategoryInput exampleInput)
         {
             var input = new UpdateCategoryInput(exampleInput.Id, exampleInput.Name, exampleInput.Description);
             var repositoryMock = _fixture.GetRepositoryMock();
@@ -99,19 +99,19 @@ namespace FC.Codeflix.Catalog.UnitTests.Application.UpdateCategory
         [Theory(DisplayName = nameof(UpdateCategoryOnlyName))]
         [Trait("Application", "UpdateCategory - Use Cases")]
         [MemberData(nameof(UpdateCategoryTestDataGenerator.GetCategoriesToUpdate), parameters: 10, MemberType = typeof(UpdateCategoryTestDataGenerator))]
-        public async Task UpdateCategoryOnlyName(Category exampleCategory, UseCase.UpdateCategoryInput exampleInput)
+        public async Task UpdateCategoryOnlyName(DomainEntity.Category exampleCategory, UpdateCategoryInput exampleInput)
         {
             var input = new UpdateCategoryInput(exampleInput.Id, exampleInput.Name);
 
             var repositoryMock = _fixture.GetRepositoryMock();
             var unitOfWorkMock = _fixture.GetUnitOfWorkMock();
-            
+
             repositoryMock.Setup(x => x.Get(exampleCategory.Id, It.IsAny<CancellationToken>())).ReturnsAsync(exampleCategory);
 
             var useCase = new UseCase.UpdateCategory(repositoryMock.Object, unitOfWorkMock.Object);
 
             CategoryModelOutput output = await useCase.Handle(input, CancellationToken.None);
-            
+
             output.Should().NotBeNull();
             output.Name.Should().Be(input.Name);
             output.Description.Should().Be(exampleCategory.Description);
