@@ -44,12 +44,10 @@ namespace FC.Codeflix.Catalog.IntegrationTests.Infra.Data.EF.Repositories.Catego
                 getRandomBoolean()
             );
 
-        //public CodeFlixCatalogDbContext CreateDbContext()
-        //    => new(
-        //        new DbContextOptionsBuilder<CodeFlixCatalogDbContext>()
-        //        .UseInMemoryDatabase("integration-tests-db")
-        //        .Options
-        //    );
+        public List<Category> GetExampleCategoriesList(int length = 10)
+            => Enumerable.Range(1, length)
+                .Select(_ => GetExampleCategory()).ToList();
+
         public CodeFlixCatalogDbContext CreateDbContext()
             => new(
                 new DbContextOptionsBuilder<CodeFlixCatalogDbContext>()
